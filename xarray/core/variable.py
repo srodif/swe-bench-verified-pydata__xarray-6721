@@ -1014,10 +1014,17 @@ class Variable(AbstractArray, NdimSizeLenMixin, VariableArithmetic):
         Variable.chunks
         xarray.unify_chunks
         """
+        # First try to get chunks from the data directly (for dask arrays)
         if hasattr(self._data, "chunks"):
-            return Frozen({dim: c for dim, c in zip(self.dims, self.data.chunks)})
-        else:
-            return {}
+            return Frozen({dim: c for dim, c in zip(self.dims, self._data.chunks)})
+        
+        # For zarr arrays, chunk information is stored in encoding
+        elif "chunks" in self.encoding:
+            chunks = self.encoding["chunks"]
+            if isinstance(chunks, tuple) and len(chunks) == len(self.dims):
+                return Frozen(dict(zip(self.dims, chunks)))
+        
+        return {}
 
     _array_counter = itertools.count()
 

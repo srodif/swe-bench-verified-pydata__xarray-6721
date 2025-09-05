@@ -2023,7 +2023,9 @@ def get_chunksizes(
 
     chunks: dict[Any, tuple[int, ...]] = {}
     for v in variables:
-        if hasattr(v.data, "chunks"):
+        # Check for chunks without accessing the data property to avoid 
+        # loading entire arrays into memory for zarr-backed variables
+        if hasattr(v._data, "chunks") or "chunks" in v.encoding:
             for dim, c in v.chunksizes.items():
                 if dim in chunks and c != chunks[dim]:
                     raise ValueError(
