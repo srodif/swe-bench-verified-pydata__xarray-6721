@@ -28,7 +28,7 @@ class AlwaysLessThan:
         return isinstance(other, type(self))
 
 
-# Equivalence to np.inf (-np.inf) for object-type
+# Equivalence to np.inf (-np.inf) for object-type.
 INF = AlwaysGreaterThan()
 NINF = AlwaysLessThan()
 
